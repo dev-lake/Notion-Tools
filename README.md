@@ -1,6 +1,16 @@
 # Notion to Word Converter
 
+[![Online Service](https://img.shields.io/badge/🌐_Try_Online-notiontoword.space-blue?style=for-the-badge)](https://notiontoword.space/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/dev-lake/Notion-Tools)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
 A Flask web application that converts Notion-exported markdown files to beautifully formatted Word documents (.docx). Supports batch conversion, preserves formatting, and handles images including those with URL-encoded paths (e.g., Chinese characters).
+
+## 🌐 Online Service
+
+**Try it now without installation:** [https://notiontoword.space/](https://notiontoword.space/)
+
+No setup required - just upload your Notion export and download the converted Word documents!
 
 ## Features
 
@@ -54,7 +64,17 @@ The following packages will be installed:
 
 ## Usage
 
-### Docker Deployment (Recommended for Production)
+### 🌐 Online Service (Easiest)
+
+**No installation needed!** Use the hosted version:
+
+👉 **[https://notiontoword.space/](https://notiontoword.space/)**
+
+Simply upload your Notion export and download the converted Word documents instantly.
+
+---
+
+### Docker Deployment (Recommended for Self-Hosting)
 
 **Quick start with Docker Compose:**
 ```bash
