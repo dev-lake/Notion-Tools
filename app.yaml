@@ -1,0 +1,27 @@
+# Cloud Run deployment configuration
+# Use this for Google Cloud Run deployments
+
+service: notion-to-word-converter
+runtime: custom
+
+env_variables:
+  FLASK_ENV: production
+  PORT: 8080
+
+# Increase timeout for large file processing
+timeout: 300s
+
+# Memory and CPU allocation
+resources:
+  memory: 2Gi
+  cpu: 2
+
+# Scaling configuration
+automatic_scaling:
+  min_instances: 0
+  max_instances: 10
+  target_cpu_utilization: 0.8
+
+# Allow unauthenticated access (change for production)
+# For authenticated access, remove this or set to false
+allow_unauthenticated: true
