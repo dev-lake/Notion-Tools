@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  notion-converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notion-to-word-converter
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-change-this-secret-key-in-production}
+    volumes:
+      # Persist uploaded and output files
+      - ./uploads:/app/uploads
+      - ./output:/app/output
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - notion-converter-network
+
+networks:
+  notion-converter-network:
+    driver: bridge

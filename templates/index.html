@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion to Word Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f7f6f3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: #37352f;
+        }
+
+        .container {
+            background: white;
+            border-radius: 3px;
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            padding: 60px 50px;
+            max-width: 720px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 78px;
+            height: 78px;
+            background: linear-gradient(135deg, #fff 0%, #f7f6f3 100%);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 42px;
+            box-shadow: rgba(15, 15, 15, 0.1) 0px 0px 0px 1px inset;
+        }
+
+        h1 {
+            color: #37352f;
+            margin-bottom: 12px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: rgba(55, 53, 47, 0.65);
+            font-size: 16px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(55, 53, 47, 0.16);
+            border-radius: 3px;
+            padding: 48px 32px;
+            text-align: center;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            background: rgba(242, 241, 238, 0.6);
+            display: block;
+            width: 100%;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(55, 53, 47, 0.3);
+            background: rgba(242, 241, 238, 0.9);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .upload-text {
+            color: #37352f;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            color: rgba(55, 53, 47, 0.45);
+            font-size: 14px;
+            display: block;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: #37352f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 24px;
+            width: 100%;
+            transition: background 0.15s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #2f2e2a;
+        }
+
+        .btn:active:not(:disabled) {
+            background: #1f1e1b;
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 3px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .alert-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .alert-success {
+            background: rgba(46, 170, 220, 0.1);
+            color: #0b6e99;
+            border: 1px solid rgba(46, 170, 220, 0.2);
+        }
+
+        .alert-error {
+            background: rgba(235, 87, 87, 0.1);
+            color: #c03434;
+            border: 1px solid rgba(235, 87, 87, 0.2);
+        }
+
+        .alert-warning {
+            background: rgba(255, 163, 68, 0.1);
+            color: #b36200;
+            border: 1px solid rgba(255, 163, 68, 0.2);
+        }
+
+        .download-section {
+            margin-top: 32px;
+            padding: 32px;
+            background: rgba(46, 170, 220, 0.08);
+            border-radius: 3px;
+            text-align: center;
+            border: 1px solid rgba(46, 170, 220, 0.16);
+        }
+
+        .download-section-title {
+            color: #37352f;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .download-section-text {
+            color: rgba(55, 53, 47, 0.65);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #2eaadc;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 3px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background 0.15s ease;
+        }
+
+        .download-btn:hover {
+            background: #2594c2;
+        }
+
+        .selected-file {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(46, 170, 220, 0.08);
+            border-radius: 3px;
+            color: #0b6e99;
+            font-size: 14px;
+            display: none;
+            border: 1px solid rgba(46, 170, 220, 0.16);
+        }
+
+        .selected-file.show {
+            display: block;
+        }
+
+        .feature-list {
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(55, 53, 47, 0.09);
+        }
+
+        .feature-list h3 {
+            color: #37352f;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .feature-item {
+            padding: 12px 16px;
+            background: rgba(242, 241, 238, 0.6);
+            border-radius: 3px;
+            color: rgba(55, 53, 47, 0.85);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(55, 53, 47, 0.06);
+        }
+
+        .feature-item:before {
+            content: "✓";
+            color: #2eaadc;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        form {
+            display: block;
+            width: 100%;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 40px 30px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">📄</div>
+            <h1>Notion to Word</h1>
+            <p class="subtitle">Convert your Notion exports to beautifully formatted Word documents</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span class="alert-icon">
+                            {% if category == 'success' %}✓{% elif category == 'error' %}✕{% else %}⚠{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/upload" enctype="multipart/form-data" id="uploadForm">
+            <label for="file" class="upload-area" id="uploadArea">
+                <div class="upload-icon">📦</div>
+                <div class="upload-text">Click to select your Notion export</div>
+                <div class="upload-hint">or drag and drop a .zip file here</div>
+            </label>
+            <input type="file" name="file" id="file" accept=".zip" required>
+            <div class="selected-file" id="selectedFile"></div>
+            <button type="submit" class="btn" id="submitBtn" disabled>Convert to Word</button>
+        </form>
+
+        {% if download_file %}
+        <div class="download-section">
+            <p class="download-section-title">✓ Conversion Complete</p>
+            <p class="download-section-text">Your Word documents are ready to download</p>
+            <a href="/download/{{ download_file }}" class="download-btn">
+                <span>⬇</span>
+                <span>Download ZIP</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="feature-list">
+            <h3>Supported Features</h3>
+            <div class="feature-grid">
+                <div class="feature-item">Headings & text formatting</div>
+                <div class="feature-item">Bold, italic & code</div>
+                <div class="feature-item">Lists & nested lists</div>
+                <div class="feature-item">Tables with headers</div>
+                <div class="feature-item">Code blocks</div>
+                <div class="feature-item">Links & images</div>
+                <div class="feature-item">Blockquotes</div>
+                <div class="feature-item">Unicode filenames</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file');
+        const uploadArea = document.getElementById('uploadArea');
+        const selectedFile = document.getElementById('selectedFile');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadForm = document.getElementById('uploadForm');
+
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                const fileName = this.files[0].name;
+                const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+                selectedFile.textContent = `📎 ${fileName} (${fileSize} MB)`;
+                selectedFile.classList.add('show');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.3)';
+            this.style.background = 'rgba(242, 241, 238, 0.9)';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
+            this.style.background = 'rgba(242, 241, 238, 0.6)';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
+            this.style.background = 'rgba(242, 241, 238, 0.6)';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+
+        // Show loading state on submit
+        uploadForm.addEventListener('submit', function() {
+            submitBtn.textContent = 'Converting...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
