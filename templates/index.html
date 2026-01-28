@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notion to Word Converter</title>
+    <title>Document Converter - Notion, Markdown, PDF to Word</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,11 +18,90 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f7f6f3;
             min-height: 100vh;
+            color: #37352f;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 1px 2px;
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
             color: #37352f;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .navbar-logo {
+            font-size: 28px;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .navbar-item {
+            position: relative;
+        }
+
+        .navbar-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 3px;
+            text-decoration: none;
+            color: rgba(55, 53, 47, 0.65);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+
+        .navbar-link:hover {
+            background: rgba(55, 53, 47, 0.06);
+            color: #37352f;
+        }
+
+        .navbar-link.active {
+            background: rgba(46, 170, 220, 0.1);
+            color: #2eaadc;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .converter-section {
+            display: none;
+        }
+
+        .converter-section.active {
+            display: block;
         }
 
         .container {
@@ -31,7 +110,7 @@
             box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
             padding: 60px 50px;
             max-width: 720px;
-            width: 100%;
+            margin: 0 auto;
         }
 
         .header {
@@ -273,7 +352,21 @@
             width: 100%;
         }
 
-        @media (max-width: 640px) {
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-direction: column;
+                height: auto;
+                padding: 16px 0;
+                gap: 16px;
+            }
+
+            .navbar-menu {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
             .container {
                 padding: 40px 30px;
             }
@@ -286,114 +379,313 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Coming Soon Badge */
+        .coming-soon {
+            display: inline-block;
+            background: rgba(255, 163, 68, 0.15);
+            color: #b36200;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: 6px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">📄</div>
-            <h1>Notion to Word</h1>
-            <p class="subtitle">Convert your Notion exports to beautifully formatted Word documents</p>
-        </div>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        <span class="alert-icon">
-                            {% if category == 'success' %}✓{% elif category == 'error' %}✕{% else %}⚠{% endif %}
-                        </span>
-                        <span>{{ message }}</span>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <form method="POST" action="/upload" enctype="multipart/form-data" id="uploadForm">
-            <label for="file" class="upload-area" id="uploadArea">
-                <div class="upload-icon">📦</div>
-                <div class="upload-text">Click to select your Notion export</div>
-                <div class="upload-hint">or drag and drop a .zip file here</div>
-            </label>
-            <input type="file" name="file" id="file" accept=".zip" required>
-            <div class="selected-file" id="selectedFile"></div>
-            <button type="submit" class="btn" id="submitBtn" disabled>Convert to Word</button>
-        </form>
-
-        {% if download_file %}
-        <div class="download-section">
-            <p class="download-section-title">✓ Conversion Complete</p>
-            <p class="download-section-text">Your Word documents are ready to download</p>
-            <a href="/download/{{ download_file }}" class="download-btn">
-                <span>⬇</span>
-                <span>Download ZIP</span>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <span class="navbar-logo">📄</span>
+                <span>Document Converter</span>
             </a>
+            <ul class="navbar-menu">
+                <li class="navbar-item">
+                    <a class="navbar-link active" data-section="notion">
+                        <span>📦</span>
+                        <span>Notion to Word</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a class="navbar-link" data-section="markdown">
+                        <span>📝</span>
+                        <span>Markdown to Word</span>
+                    </a>
+                </li>
+                <li class="navbar-item">
+                    <a class="navbar-link" data-section="pdf">
+                        <span>📕</span>
+                        <span>PDF to Word</span>
+                        <span class="coming-soon">Soon</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-        {% endif %}
+    </nav>
 
-        <div class="feature-list">
-            <h3>Supported Features</h3>
-            <div class="feature-grid">
-                <div class="feature-item">Headings & text formatting</div>
-                <div class="feature-item">Bold, italic & code</div>
-                <div class="feature-item">Lists & nested lists</div>
-                <div class="feature-item">Tables with headers</div>
-                <div class="feature-item">Code blocks</div>
-                <div class="feature-item">Links & images</div>
-                <div class="feature-item">Blockquotes</div>
-                <div class="feature-item">Unicode filenames</div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Notion to Word Section -->
+        <div id="notion-section" class="converter-section active">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">📦</div>
+                    <h1>Notion to Word</h1>
+                    <p class="subtitle">Convert your Notion exports to beautifully formatted Word documents</p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                <span class="alert-icon">
+                                    {% if category == 'success' %}✓{% elif category == 'error' %}✕{% else %}⚠{% endif %}
+                                </span>
+                                <span>{{ message }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="/upload" enctype="multipart/form-data" id="notionForm">
+                    <input type="hidden" name="converter_type" value="notion">
+                    <label for="notionFile" class="upload-area" id="notionUploadArea">
+                        <div class="upload-icon">📦</div>
+                        <div class="upload-text">Click to select your Notion export</div>
+                        <div class="upload-hint">or drag and drop a .zip file here</div>
+                    </label>
+                    <input type="file" name="file" id="notionFile" accept=".zip" required>
+                    <div class="selected-file" id="notionSelectedFile"></div>
+                    <button type="submit" class="btn" id="notionSubmitBtn" disabled>Convert to Word</button>
+                </form>
+
+                {% if download_file %}
+                <div class="download-section">
+                    <p class="download-section-title">✓ Conversion Complete</p>
+                    <p class="download-section-text">Your Word documents are ready to download</p>
+                    <a href="/download/{{ download_file }}" class="download-btn">
+                        <span>⬇</span>
+                        <span>Download ZIP</span>
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="feature-list">
+                    <h3>Supported Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">Headings & text formatting</div>
+                        <div class="feature-item">Bold, italic & code</div>
+                        <div class="feature-item">Lists & nested lists</div>
+                        <div class="feature-item">Tables with headers</div>
+                        <div class="feature-item">Code blocks</div>
+                        <div class="feature-item">Links & images</div>
+                        <div class="feature-item">Blockquotes</div>
+                        <div class="feature-item">Unicode filenames</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Markdown to Word Section -->
+        <div id="markdown-section" class="converter-section">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">📝</div>
+                    <h1>Markdown to Word</h1>
+                    <p class="subtitle">Convert standalone Markdown files to Word documents</p>
+                </div>
+
+                <form method="POST" action="/convert-markdown" enctype="multipart/form-data" id="markdownForm">
+                    <label for="markdownFile" class="upload-area" id="markdownUploadArea">
+                        <div class="upload-icon">📝</div>
+                        <div class="upload-text">Click to select Markdown file(s)</div>
+                        <div class="upload-hint">or drag and drop .md files here (supports multiple files)</div>
+                    </label>
+                    <input type="file" name="files" id="markdownFile" accept=".md,.markdown" multiple required>
+                    <div class="selected-file" id="markdownSelectedFile"></div>
+                    <button type="submit" class="btn" id="markdownSubmitBtn" disabled>Convert to Word</button>
+                </form>
+
+                <div class="feature-list">
+                    <h3>Supported Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">Multiple files at once</div>
+                        <div class="feature-item">All Markdown syntax</div>
+                        <div class="feature-item">GFM (GitHub Flavored)</div>
+                        <div class="feature-item">Tables & task lists</div>
+                        <div class="feature-item">Code blocks with syntax</div>
+                        <div class="feature-item">Embedded images</div>
+                        <div class="feature-item">Chinese/CJK support</div>
+                        <div class="feature-item">Batch download as ZIP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF to Word Section -->
+        <div id="pdf-section" class="converter-section">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">📕</div>
+                    <h1>PDF to Word</h1>
+                    <p class="subtitle">Convert PDF documents to editable Word files</p>
+                </div>
+
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠</span>
+                    <span>This feature is coming soon! We're working on adding PDF to Word conversion with OCR support.</span>
+                </div>
+
+                <div class="upload-area" style="opacity: 0.5; cursor: not-allowed;">
+                    <div class="upload-icon">📕</div>
+                    <div class="upload-text">PDF to Word conversion</div>
+                    <div class="upload-hint">Coming soon...</div>
+                </div>
+
+                <div class="feature-list">
+                    <h3>Planned Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-item">Text extraction</div>
+                        <div class="feature-item">OCR support</div>
+                        <div class="feature-item">Image preservation</div>
+                        <div class="feature-item">Table detection</div>
+                        <div class="feature-item">Layout preservation</div>
+                        <div class="feature-item">Multi-page support</div>
+                        <div class="feature-item">Batch conversion</div>
+                        <div class="feature-item">Format retention</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const fileInput = document.getElementById('file');
-        const uploadArea = document.getElementById('uploadArea');
-        const selectedFile = document.getElementById('selectedFile');
-        const submitBtn = document.getElementById('submitBtn');
-        const uploadForm = document.getElementById('uploadForm');
+        // Navigation
+        const navLinks = document.querySelectorAll('.navbar-link');
+        const sections = document.querySelectorAll('.converter-section');
 
-        // Handle file selection
-        fileInput.addEventListener('change', function(e) {
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+
+                // Don't switch if it's the PDF section (coming soon)
+                if (sectionId === 'pdf') {
+                    return;
+                }
+
+                // Update active nav link
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Show corresponding section
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(`${sectionId}-section`).classList.add('active');
+            });
+        });
+
+        // Notion Form Handler
+        const notionFileInput = document.getElementById('notionFile');
+        const notionUploadArea = document.getElementById('notionUploadArea');
+        const notionSelectedFile = document.getElementById('notionSelectedFile');
+        const notionSubmitBtn = document.getElementById('notionSubmitBtn');
+        const notionForm = document.getElementById('notionForm');
+
+        notionFileInput.addEventListener('change', function(e) {
             if (this.files.length > 0) {
                 const fileName = this.files[0].name;
                 const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
-                selectedFile.textContent = `📎 ${fileName} (${fileSize} MB)`;
-                selectedFile.classList.add('show');
-                submitBtn.disabled = false;
+                notionSelectedFile.textContent = `📎 ${fileName} (${fileSize} MB)`;
+                notionSelectedFile.classList.add('show');
+                notionSubmitBtn.disabled = false;
             }
         });
 
-        // Drag and drop functionality
-        uploadArea.addEventListener('dragover', function(e) {
+        // Drag and drop for Notion
+        notionUploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
             this.style.borderColor = 'rgba(55, 53, 47, 0.3)';
             this.style.background = 'rgba(242, 241, 238, 0.9)';
         });
 
-        uploadArea.addEventListener('dragleave', function(e) {
+        notionUploadArea.addEventListener('dragleave', function(e) {
             e.preventDefault();
             this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
             this.style.background = 'rgba(242, 241, 238, 0.6)';
         });
 
-        uploadArea.addEventListener('drop', function(e) {
+        notionUploadArea.addEventListener('drop', function(e) {
             e.preventDefault();
             this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
             this.style.background = 'rgba(242, 241, 238, 0.6)';
 
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                fileInput.files = files;
+                notionFileInput.files = files;
                 const event = new Event('change');
-                fileInput.dispatchEvent(event);
+                notionFileInput.dispatchEvent(event);
             }
         });
 
-        // Show loading state on submit
-        uploadForm.addEventListener('submit', function() {
-            submitBtn.textContent = 'Converting...';
-            submitBtn.disabled = true;
+        notionForm.addEventListener('submit', function() {
+            notionSubmitBtn.textContent = 'Converting...';
+            notionSubmitBtn.disabled = true;
+        });
+
+        // Markdown Form Handler
+        const markdownFileInput = document.getElementById('markdownFile');
+        const markdownUploadArea = document.getElementById('markdownUploadArea');
+        const markdownSelectedFile = document.getElementById('markdownSelectedFile');
+        const markdownSubmitBtn = document.getElementById('markdownSubmitBtn');
+        const markdownForm = document.getElementById('markdownForm');
+
+        markdownFileInput.addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                const fileCount = this.files.length;
+                const totalSize = Array.from(this.files).reduce((sum, file) => sum + file.size, 0);
+                const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
+
+                if (fileCount === 1) {
+                    markdownSelectedFile.textContent = `📎 ${this.files[0].name} (${sizeMB} MB)`;
+                } else {
+                    markdownSelectedFile.textContent = `📎 ${fileCount} files selected (${sizeMB} MB total)`;
+                }
+                markdownSelectedFile.classList.add('show');
+                markdownSubmitBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop for Markdown
+        markdownUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.3)';
+            this.style.background = 'rgba(242, 241, 238, 0.9)';
+        });
+
+        markdownUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
+            this.style.background = 'rgba(242, 241, 238, 0.6)';
+        });
+
+        markdownUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
+            this.style.background = 'rgba(242, 241, 238, 0.6)';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                markdownFileInput.files = files;
+                const event = new Event('change');
+                markdownFileInput.dispatchEvent(event);
+            }
+        });
+
+        markdownForm.addEventListener('submit', function() {
+            markdownSubmitBtn.textContent = 'Converting...';
+            markdownSubmitBtn.disabled = true;
         });
     </script>
 </body>
