@@ -6,6 +6,7 @@ from pathlib import Path
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from converter import convert_markdown_to_docx
+from pdf_converter import convert_pdf_to_docx_simple
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here')  # Use env var in production
@@ -257,6 +258,102 @@ def convert_markdown():
 
         # Success message
         flash(f'Successfully converted {len(converted_files)} markdown file(s) to Word documents', 'success')
+        print(f"[DEBUG] Conversion complete, redirecting with download_file={output_zip_name}")
+
+        # Store download file in session and redirect (Post/Redirect/Get pattern)
+        session['download_file'] = output_zip_name
+        return redirect(url_for('index'))
+
+    except Exception as e:
+        print(f"[DEBUG] Unexpected exception: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        flash(f'An error occurred: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+
+@app.route('/convert-pdf', methods=['POST'])
+def convert_pdf():
+    """Convert PDF files to Word documents."""
+    # Check if files were uploaded
+    if 'files' not in request.files:
+        flash('No files uploaded', 'error')
+        return redirect(url_for('index'))
+
+    files = request.files.getlist('files')
+
+    # Check if any files were selected
+    if not files or files[0].filename == '':
+        flash('No files selected', 'error')
+        return redirect(url_for('index'))
+
+    try:
+        # Generate unique ID for this conversion
+        upload_id = str(uuid.uuid4())
+
+        # Create output directory for this conversion
+        output_dir = os.path.join(app.config['OUTPUT_FOLDER'], upload_id)
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Convert each PDF file
+        converted_files = []
+        for file in files:
+            if file and file.filename.lower().endswith('.pdf'):
+                try:
+                    # Save PDF file temporarily
+                    filename = secure_filename(file.filename)
+                    temp_pdf_path = os.path.join(output_dir, filename)
+                    file.save(temp_pdf_path)
+                    print(f"[DEBUG] Saved PDF file: {filename}")
+
+                    # Generate output filename
+                    docx_filename = os.path.splitext(filename)[0] + '.docx'
+                    output_path = os.path.join(output_dir, docx_filename)
+
+                    # Convert to Word (using simple mode for better reliability)
+                    convert_pdf_to_docx_simple(temp_pdf_path, output_path)
+                    converted_files.append(docx_filename)
+                    print(f"[DEBUG] Successfully converted: {filename}")
+
+                    # Remove temporary PDF file
+                    os.remove(temp_pdf_path)
+                except Exception as e:
+                    print(f"[DEBUG] Error converting {file.filename}: {str(e)}")
+                    flash(f'Error converting {file.filename}: {str(e)}', 'warning')
+
+        if not converted_files:
+            flash('No valid PDF files were converted', 'error')
+            cleanup_temp_files(output_dir)
+            return redirect(url_for('index'))
+
+        # If only one file, return it directly
+        if len(converted_files) == 1:
+            file_path = os.path.join(output_dir, converted_files[0])
+            response = send_file(
+                file_path,
+                as_attachment=True,
+                download_name=converted_files[0]
+            )
+            # Cleanup after sending
+            # Note: In production, use a background task for cleanup
+            return response
+
+        # Create a zip file with all converted documents
+        output_zip_name = f'{upload_id}_pdf_converted.zip'
+        output_zip_path = os.path.join(app.config['OUTPUT_FOLDER'], output_zip_name)
+        print(f"[DEBUG] Creating output zip: {output_zip_path}")
+
+        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for docx_file in converted_files:
+                file_path = os.path.join(output_dir, docx_file)
+                zipf.write(file_path, docx_file)
+        print(f"[DEBUG] Created zip with {len(converted_files)} files")
+
+        # Cleanup temporary files
+        cleanup_temp_files(output_dir)
+
+        # Success message
+        flash(f'Successfully converted {len(converted_files)} PDF file(s) to Word documents', 'success')
         print(f"[DEBUG] Conversion complete, redirecting with download_file={output_zip_name}")
 
         # Store download file in session and redirect (Post/Redirect/Get pattern)

@@ -418,7 +418,6 @@
                     <a class="navbar-link" data-section="pdf">
                         <span>📕</span>
                         <span>PDF to Word</span>
-                        <span class="coming-soon">Soon</span>
                     </a>
                 </li>
             </ul>
@@ -533,28 +532,28 @@
                     <p class="subtitle">Convert PDF documents to editable Word files</p>
                 </div>
 
-                <div class="alert alert-warning">
-                    <span class="alert-icon">⚠</span>
-                    <span>This feature is coming soon! We're working on adding PDF to Word conversion with OCR support.</span>
-                </div>
-
-                <div class="upload-area" style="opacity: 0.5; cursor: not-allowed;">
-                    <div class="upload-icon">📕</div>
-                    <div class="upload-text">PDF to Word conversion</div>
-                    <div class="upload-hint">Coming soon...</div>
-                </div>
+                <form method="POST" action="/convert-pdf" enctype="multipart/form-data" id="pdfForm">
+                    <label for="pdfFile" class="upload-area" id="pdfUploadArea">
+                        <div class="upload-icon">📕</div>
+                        <div class="upload-text">Click to select PDF file(s)</div>
+                        <div class="upload-hint">or drag and drop .pdf files here (supports multiple files)</div>
+                    </label>
+                    <input type="file" name="files" id="pdfFile" accept=".pdf" multiple required>
+                    <div class="selected-file" id="pdfSelectedFile"></div>
+                    <button type="submit" class="btn" id="pdfSubmitBtn" disabled>Convert to Word</button>
+                </form>
 
                 <div class="feature-list">
-                    <h3>Planned Features</h3>
+                    <h3>Supported Features</h3>
                     <div class="feature-grid">
                         <div class="feature-item">Text extraction</div>
-                        <div class="feature-item">OCR support</div>
-                        <div class="feature-item">Image preservation</div>
                         <div class="feature-item">Table detection</div>
-                        <div class="feature-item">Layout preservation</div>
                         <div class="feature-item">Multi-page support</div>
                         <div class="feature-item">Batch conversion</div>
-                        <div class="feature-item">Format retention</div>
+                        <div class="feature-item">Heading detection</div>
+                        <div class="feature-item">Chinese/CJK support</div>
+                        <div class="feature-item">Format preservation</div>
+                        <div class="feature-item">ZIP download</div>
                     </div>
                 </div>
             </div>
@@ -570,11 +569,6 @@
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const sectionId = link.getAttribute('data-section');
-
-                // Don't switch if it's the PDF section (coming soon)
-                if (sectionId === 'pdf') {
-                    return;
-                }
 
                 // Update active nav link
                 navLinks.forEach(l => l.classList.remove('active'));
@@ -686,6 +680,60 @@
         markdownForm.addEventListener('submit', function() {
             markdownSubmitBtn.textContent = 'Converting...';
             markdownSubmitBtn.disabled = true;
+        });
+
+        // PDF Form Handler
+        const pdfFileInput = document.getElementById('pdfFile');
+        const pdfUploadArea = document.getElementById('pdfUploadArea');
+        const pdfSelectedFile = document.getElementById('pdfSelectedFile');
+        const pdfSubmitBtn = document.getElementById('pdfSubmitBtn');
+        const pdfForm = document.getElementById('pdfForm');
+
+        pdfFileInput.addEventListener('change', function(e) {
+            if (this.files.length > 0) {
+                const fileCount = this.files.length;
+                const totalSize = Array.from(this.files).reduce((sum, file) => sum + file.size, 0);
+                const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
+
+                if (fileCount === 1) {
+                    pdfSelectedFile.textContent = `📎 ${this.files[0].name} (${sizeMB} MB)`;
+                } else {
+                    pdfSelectedFile.textContent = `📎 ${fileCount} files selected (${sizeMB} MB total)`;
+                }
+                pdfSelectedFile.classList.add('show');
+                pdfSubmitBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop for PDF
+        pdfUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.3)';
+            this.style.background = 'rgba(242, 241, 238, 0.9)';
+        });
+
+        pdfUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
+            this.style.background = 'rgba(242, 241, 238, 0.6)';
+        });
+
+        pdfUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = 'rgba(55, 53, 47, 0.16)';
+            this.style.background = 'rgba(242, 241, 238, 0.6)';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                pdfFileInput.files = files;
+                const event = new Event('change');
+                pdfFileInput.dispatchEvent(event);
+            }
+        });
+
+        pdfForm.addEventListener('submit', function() {
+            pdfSubmitBtn.textContent = 'Converting...';
+            pdfSubmitBtn.disabled = true;
         });
     </script>
 </body>

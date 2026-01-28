@@ -6,3 +6,5 @@ html5lib==1.1
 BeautifulSoup4==4.12.3
 gunicorn==21.2.0
 requests==2.31.0
+pypdf2==3.0.1
+pdfplumber==0.10.3
