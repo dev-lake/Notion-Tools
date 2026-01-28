@@ -1,0 +1,147 @@
+# Japanese translations for Document Converter.
+# Copyright (C) 2026
+# This file is distributed under the same license as the Document Converter project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-28 12:00+0000\n"
+"PO-Revision-Date: 2026-01-28 12:00+0000\n"
+"Last-Translator: \n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Manual 1.0\n"
+
+msgid "Document Converter"
+msgstr "ドキュメント変換ツール"
+
+msgid "Notion to Word"
+msgstr "NotionからWord"
+
+msgid "Markdown to Word"
+msgstr "MarkdownからWord"
+
+msgid "PDF to Word"
+msgstr "PDFからWord"
+
+msgid "Convert your Notion exports to beautifully formatted Word documents"
+msgstr "Notionのエクスポートファイルを美しくフォーマットされたWord文書に変換"
+
+msgid "Convert standalone Markdown files to Word documents"
+msgstr "スタンドアロンのMarkdownファイルをWord文書に変換"
+
+msgid "Convert PDF documents to editable Word files"
+msgstr "PDF文書を編集可能なWordファイルに変換"
+
+msgid "Click to select your Notion export"
+msgstr "Notionエクスポートファイルを選択"
+
+msgid "Click to select Markdown file(s)"
+msgstr "Markdownファイルを選択"
+
+msgid "Click to select PDF file(s)"
+msgstr "PDFファイルを選択"
+
+msgid "or drag and drop a .zip file here"
+msgstr "または.zipファイルをここにドラッグ＆ドロップ"
+
+msgid "or drag and drop .md files here (supports multiple files)"
+msgstr "または.mdファイルをここにドラッグ＆ドロップ（複数ファイル対応）"
+
+msgid "or drag and drop .pdf files here (supports multiple files)"
+msgstr "または.pdfファイルをここにドラッグ＆ドロップ（複数ファイル対応）"
+
+msgid "Convert to Word"
+msgstr "Wordに変換"
+
+msgid "Converting..."
+msgstr "変換中..."
+
+msgid "Conversion Complete"
+msgstr "変換完了"
+
+msgid "Your Word documents are ready to download"
+msgstr "Word文書のダウンロード準備が完了しました"
+
+msgid "Download ZIP"
+msgstr "ZIPをダウンロード"
+
+msgid "Supported Features"
+msgstr "サポート機能"
+
+msgid "Headings & text formatting"
+msgstr "見出しとテキスト書式"
+
+msgid "Bold, italic & code"
+msgstr "太字、斜体、コード"
+
+msgid "Lists & nested lists"
+msgstr "リストとネストリスト"
+
+msgid "Tables with headers"
+msgstr "ヘッダー付きテーブル"
+
+msgid "Code blocks"
+msgstr "コードブロック"
+
+msgid "Links & images"
+msgstr "リンクと画像"
+
+msgid "Blockquotes"
+msgstr "引用ブロック"
+
+msgid "Unicode filenames"
+msgstr "Unicodeファイル名"
+
+msgid "Multiple files at once"
+msgstr "複数ファイルの一括処理"
+
+msgid "All Markdown syntax"
+msgstr "すべてのMarkdown構文"
+
+msgid "GFM (GitHub Flavored)"
+msgstr "GFM（GitHub Flavored）"
+
+msgid "Tables & task lists"
+msgstr "テーブルとタスクリスト"
+
+msgid "Code blocks with syntax"
+msgstr "構文付きコードブロック"
+
+msgid "Embedded images"
+msgstr "埋め込み画像"
+
+msgid "Chinese/CJK support"
+msgstr "中国語/CJKサポート"
+
+msgid "Batch download as ZIP"
+msgstr "ZIPで一括ダウンロード"
+
+msgid "Text extraction"
+msgstr "テキスト抽出"
+
+msgid "Table detection"
+msgstr "テーブル検出"
+
+msgid "Multi-page support"
+msgstr "複数ページ対応"
+
+msgid "Batch conversion"
+msgstr "一括変換"
+
+msgid "Heading detection"
+msgstr "見出し検出"
+
+msgid "Format preservation"
+msgstr "書式保持"
+
+msgid "ZIP download"
+msgstr "ZIPダウンロード"
+
+msgid "Language"
+msgstr "言語"

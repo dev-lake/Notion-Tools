@@ -3,7 +3,8 @@ import uuid
 import zipfile
 import shutil
 from pathlib import Path
-from flask import Flask, render_template, request, send_file, flash, redirect, url_for, session
+from flask import Flask, render_template, request, send_file, flash, redirect, url_for, session, g
+from flask_babel import Babel, gettext, get_locale
 from werkzeug.utils import secure_filename
 from converter import convert_markdown_to_docx
 from pdf_converter import convert_pdf_to_docx_simple
@@ -21,6 +22,30 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
+# Babel configuration for i18n
+app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'zh_CN', 'zh_TW', 'ja']
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+
+babel = Babel(app)
+
+def get_locale():
+    """Determine the best locale for the user."""
+    # 1. Check URL parameter
+    lang = request.args.get('lang')
+    if lang in app.config['BABEL_SUPPORTED_LOCALES']:
+        session['language'] = lang
+        return lang
+
+    # 2. Check session
+    if 'language' in session:
+        return session['language']
+
+    # 3. Check browser Accept-Language header
+    return request.accept_languages.best_match(app.config['BABEL_SUPPORTED_LOCALES']) or 'en'
+
+babel.init_app(app, locale_selector=get_locale)
+
 # Ensure directories exist
 for folder in [UPLOAD_FOLDER, OUTPUT_FOLDER]:
     os.makedirs(folder, exist_ok=True)
@@ -34,6 +59,20 @@ def cleanup_temp_files(temp_dir):
     """Remove temporary directory and its contents."""
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir)
+
+
+@app.context_processor
+def inject_locale():
+    """Inject current locale and available locales into all templates."""
+    return {
+        'current_locale': str(get_locale()),
+        'available_locales': {
+            'en': 'English',
+            'zh_CN': '简体中文',
+            'zh_TW': '繁體中文',
+            'ja': '日本語'
+        }
+    }
 
 
 @app.route('/')

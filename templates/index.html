@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ current_locale[:2] }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -456,34 +456,111 @@
             margin-left: 6px;
             font-weight: 600;
         }
+
+        /* Language Switcher */
+        .language-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .language-button {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 3px;
+            background: rgba(55, 53, 47, 0.06);
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(55, 53, 47, 0.85);
+            transition: all 0.15s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .language-button:hover {
+            background: rgba(55, 53, 47, 0.12);
+        }
+
+        .language-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background: white;
+            border-radius: 3px;
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            min-width: 160px;
+            z-index: 1000;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-option {
+            display: block;
+            padding: 10px 16px;
+            color: #37352f;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.15s ease;
+        }
+
+        .language-option:hover {
+            background: rgba(55, 53, 47, 0.06);
+        }
+
+        .language-option.active {
+            background: rgba(46, 170, 220, 0.1);
+            color: #2eaadc;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="navbar-container">
-            <a href="/" class="navbar-brand" aria-label="Document Converter Home">
+            <a href="/" class="navbar-brand" aria-label="{{ gettext('Document Converter') }}">
                 <span class="navbar-logo" aria-hidden="true">📄</span>
-                <span>Document Converter</span>
+                <span>{{ gettext('Document Converter') }}</span>
             </a>
             <ul class="navbar-menu" role="menubar">
                 <li class="navbar-item" role="none">
-                    <a href="/notion" class="navbar-link {% if active_section == 'notion' %}active{% endif %}" role="menuitem" aria-label="Convert Notion to Word">
+                    <a href="/notion?lang={{ current_locale }}" class="navbar-link {% if active_section == 'notion' %}active{% endif %}" role="menuitem" aria-label="{{ gettext('Notion to Word') }}">
                         <span aria-hidden="true">📦</span>
-                        <span>Notion to Word</span>
+                        <span>{{ gettext('Notion to Word') }}</span>
                     </a>
                 </li>
                 <li class="navbar-item" role="none">
-                    <a href="/markdown" class="navbar-link {% if active_section == 'markdown' %}active{% endif %}" role="menuitem" aria-label="Convert Markdown to Word">
+                    <a href="/markdown?lang={{ current_locale }}" class="navbar-link {% if active_section == 'markdown' %}active{% endif %}" role="menuitem" aria-label="{{ gettext('Markdown to Word') }}">
                         <span aria-hidden="true">📝</span>
-                        <span>Markdown to Word</span>
+                        <span>{{ gettext('Markdown to Word') }}</span>
                     </a>
                 </li>
                 <li class="navbar-item" role="none">
-                    <a href="/pdf" class="navbar-link {% if active_section == 'pdf' %}active{% endif %}" role="menuitem" aria-label="Convert PDF to Word">
+                    <a href="/pdf?lang={{ current_locale }}" class="navbar-link {% if active_section == 'pdf' %}active{% endif %}" role="menuitem" aria-label="{{ gettext('PDF to Word') }}">
                         <span aria-hidden="true">📕</span>
-                        <span>PDF to Word</span>
+                        <span>{{ gettext('PDF to Word') }}</span>
                     </a>
+                </li>
+                <li class="navbar-item" role="none">
+                    <div class="language-switcher">
+                        <button class="language-button" id="languageButton" aria-label="{{ gettext('Language') }}">
+                            <span>🌐</span>
+                            <span>{{ available_locales[current_locale] }}</span>
+                        </button>
+                        <div class="language-dropdown" id="languageDropdown">
+                            {% for locale_code, locale_name in available_locales.items() %}
+                            <a href="?lang={{ locale_code }}" class="language-option {% if locale_code == current_locale %}active{% endif %}">
+                                {{ locale_name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -497,7 +574,7 @@
                 <header class="header">
                     <div class="logo" aria-hidden="true">📦</div>
                     <h1 id="notion-heading">Notion to Word</h1>
-                    <p class="subtitle">Convert your Notion exports to beautifully formatted Word documents</p>
+                    <p class="subtitle">{{ gettext('Convert your Notion exports to beautifully formatted Word documents') }}</p>
                 </header>
 
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -517,36 +594,36 @@
                     <input type="hidden" name="converter_type" value="notion">
                     <label for="notionFile" class="upload-area" id="notionUploadArea" aria-label="Upload Notion export file">
                         <div class="upload-icon" aria-hidden="true">📦</div>
-                        <div class="upload-text">Click to select your Notion export</div>
-                        <div class="upload-hint">or drag and drop a .zip file here</div>
+                        <div class="upload-text">{{ gettext('Click to select your Notion export') }}</div>
+                        <div class="upload-hint">{{ gettext('or drag and drop a .zip file here') }}</div>
                     </label>
                     <input type="file" name="file" id="notionFile" accept=".zip" required aria-required="true">
                     <div class="selected-file" id="notionSelectedFile" role="status" aria-live="polite"></div>
-                    <button type="submit" class="btn" id="notionSubmitBtn" disabled aria-disabled="true">Convert to Word</button>
+                    <button type="submit" class="btn" id="notionSubmitBtn" disabled aria-disabled="true">{{ gettext('Convert to Word') }}</button>
                 </form>
 
                 {% if download_file %}
                 <div class="download-section">
                     <p class="download-section-title">✓ Conversion Complete</p>
-                    <p class="download-section-text">Your Word documents are ready to download</p>
+                    <p class="download-section-text">{{ gettext('Your Word documents are ready to download') }}</p>
                     <a href="/download/{{ download_file }}" class="download-btn">
                         <span>⬇</span>
-                        <span>Download ZIP</span>
+                        <span>{{ gettext('Download ZIP') }}</span>
                     </a>
                 </div>
                 {% endif %}
 
                 <div class="feature-list">
-                    <h3>Supported Features</h3>
+                    <h3>{{ gettext('Supported Features') }}</h3>
                     <div class="feature-grid">
-                        <div class="feature-item">Headings & text formatting</div>
-                        <div class="feature-item">Bold, italic & code</div>
-                        <div class="feature-item">Lists & nested lists</div>
-                        <div class="feature-item">Tables with headers</div>
-                        <div class="feature-item">Code blocks</div>
-                        <div class="feature-item">Links & images</div>
-                        <div class="feature-item">Blockquotes</div>
-                        <div class="feature-item">Unicode filenames</div>
+                        <div class="feature-item">{{ gettext('Headings & text formatting') }}</div>
+                        <div class="feature-item">{{ gettext('Bold, italic & code') }}</div>
+                        <div class="feature-item">{{ gettext('Lists & nested lists') }}</div>
+                        <div class="feature-item">{{ gettext('Tables with headers') }}</div>
+                        <div class="feature-item">{{ gettext('Code blocks') }}</div>
+                        <div class="feature-item">{{ gettext('Links & images') }}</div>
+                        <div class="feature-item">{{ gettext('Blockquotes') }}</div>
+                        <div class="feature-item">{{ gettext('Unicode filenames') }}</div>
                     </div>
                 </div>
             </div>
@@ -558,31 +635,31 @@
                 <header class="header">
                     <div class="logo" aria-hidden="true">📝</div>
                     <h1 id="markdown-heading">Markdown to Word</h1>
-                    <p class="subtitle">Convert standalone Markdown files to Word documents</p>
+                    <p class="subtitle">{{ gettext('Convert standalone Markdown files to Word documents') }}</p>
                 </header>
 
                 <form method="POST" action="/convert-markdown" enctype="multipart/form-data" id="markdownForm" aria-label="Markdown to Word conversion form">
                     <label for="markdownFile" class="upload-area" id="markdownUploadArea" aria-label="Upload Markdown files">
                         <div class="upload-icon" aria-hidden="true">📝</div>
-                        <div class="upload-text">Click to select Markdown file(s)</div>
-                        <div class="upload-hint">or drag and drop .md files here (supports multiple files)</div>
+                        <div class="upload-text">{{ gettext('Click to select Markdown file(s)') }}</div>
+                        <div class="upload-hint">{{ gettext('or drag and drop .md files here (supports multiple files)') }}</div>
                     </label>
                     <input type="file" name="files" id="markdownFile" accept=".md,.markdown" multiple required aria-required="true">
                     <div class="selected-file" id="markdownSelectedFile" role="status" aria-live="polite"></div>
-                    <button type="submit" class="btn" id="markdownSubmitBtn" disabled aria-disabled="true">Convert to Word</button>
+                    <button type="submit" class="btn" id="markdownSubmitBtn" disabled aria-disabled="true">{{ gettext('Convert to Word') }}</button>
                 </form>
 
                 <div class="feature-list">
-                    <h3>Supported Features</h3>
+                    <h3>{{ gettext('Supported Features') }}</h3>
                     <div class="feature-grid">
-                        <div class="feature-item">Multiple files at once</div>
-                        <div class="feature-item">All Markdown syntax</div>
-                        <div class="feature-item">GFM (GitHub Flavored)</div>
-                        <div class="feature-item">Tables & task lists</div>
-                        <div class="feature-item">Code blocks with syntax</div>
-                        <div class="feature-item">Embedded images</div>
-                        <div class="feature-item">Chinese/CJK support</div>
-                        <div class="feature-item">Batch download as ZIP</div>
+                        <div class="feature-item">{{ gettext('Multiple files at once') }}</div>
+                        <div class="feature-item">{{ gettext('All Markdown syntax') }}</div>
+                        <div class="feature-item">{{ gettext('GFM (GitHub Flavored)') }}</div>
+                        <div class="feature-item">{{ gettext('Tables & task lists') }}</div>
+                        <div class="feature-item">{{ gettext('Code blocks with syntax') }}</div>
+                        <div class="feature-item">{{ gettext('Embedded images') }}</div>
+                        <div class="feature-item">{{ gettext('Chinese/CJK support') }}</div>
+                        <div class="feature-item">{{ gettext('Batch download as ZIP') }}</div>
                     </div>
                 </div>
             </div>
@@ -594,31 +671,31 @@
                 <header class="header">
                     <div class="logo" aria-hidden="true">📕</div>
                     <h1 id="pdf-heading">PDF to Word</h1>
-                    <p class="subtitle">Convert PDF documents to editable Word files</p>
+                    <p class="subtitle">{{ gettext('Convert PDF documents to editable Word files') }}</p>
                 </header>
 
                 <form method="POST" action="/convert-pdf" enctype="multipart/form-data" id="pdfForm" aria-label="PDF to Word conversion form">
                     <label for="pdfFile" class="upload-area" id="pdfUploadArea" aria-label="Upload PDF files">
                         <div class="upload-icon" aria-hidden="true">📕</div>
-                        <div class="upload-text">Click to select PDF file(s)</div>
-                        <div class="upload-hint">or drag and drop .pdf files here (supports multiple files)</div>
+                        <div class="upload-text">{{ gettext('Click to select PDF file(s)') }}</div>
+                        <div class="upload-hint">{{ gettext('or drag and drop .pdf files here (supports multiple files)') }}</div>
                     </label>
                     <input type="file" name="files" id="pdfFile" accept=".pdf" multiple required aria-required="true">
                     <div class="selected-file" id="pdfSelectedFile" role="status" aria-live="polite"></div>
-                    <button type="submit" class="btn" id="pdfSubmitBtn" disabled aria-disabled="true">Convert to Word</button>
+                    <button type="submit" class="btn" id="pdfSubmitBtn" disabled aria-disabled="true">{{ gettext('Convert to Word') }}</button>
                 </form>
 
                 <div class="feature-list">
-                    <h3>Supported Features</h3>
+                    <h3>{{ gettext('Supported Features') }}</h3>
                     <div class="feature-grid">
-                        <div class="feature-item">Text extraction</div>
-                        <div class="feature-item">Table detection</div>
-                        <div class="feature-item">Multi-page support</div>
-                        <div class="feature-item">Batch conversion</div>
-                        <div class="feature-item">Heading detection</div>
-                        <div class="feature-item">Chinese/CJK support</div>
-                        <div class="feature-item">Format preservation</div>
-                        <div class="feature-item">ZIP download</div>
+                        <div class="feature-item">{{ gettext('Text extraction') }}</div>
+                        <div class="feature-item">{{ gettext('Table detection') }}</div>
+                        <div class="feature-item">{{ gettext('Multi-page support') }}</div>
+                        <div class="feature-item">{{ gettext('Batch conversion') }}</div>
+                        <div class="feature-item">{{ gettext('Heading detection') }}</div>
+                        <div class="feature-item">{{ gettext('Chinese/CJK support') }}</div>
+                        <div class="feature-item">{{ gettext('Format preservation') }}</div>
+                        <div class="feature-item">{{ gettext('ZIP download') }}</div>
                     </div>
                 </div>
             </div>
@@ -626,6 +703,24 @@
     </main>
 
     <script>
+        // Language Switcher
+        const languageButton = document.getElementById('languageButton');
+        const languageDropdown = document.getElementById('languageDropdown');
+
+        if (languageButton && languageDropdown) {
+            languageButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                languageDropdown.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!languageButton.contains(e.target) && !languageDropdown.contains(e.target)) {
+                    languageDropdown.classList.remove('show');
+                }
+            });
+        }
+
         // Notion Form Handler
         const notionFileInput = document.getElementById('notionFile');
         const notionUploadArea = document.getElementById('notionUploadArea');
@@ -670,7 +765,7 @@
         });
 
         notionForm.addEventListener('submit', function() {
-            notionSubmitBtn.textContent = 'Converting...';
+            notionSubmitBtn.textContent = "{{ gettext('Converting...') }}";
             notionSubmitBtn.disabled = true;
         });
 
@@ -724,7 +819,7 @@
         });
 
         markdownForm.addEventListener('submit', function() {
-            markdownSubmitBtn.textContent = 'Converting...';
+            markdownSubmitBtn.textContent = "{{ gettext('Converting...') }}";
             markdownSubmitBtn.disabled = true;
         });
 
@@ -778,7 +873,7 @@
         });
 
         pdfForm.addEventListener('submit', function() {
-            pdfSubmitBtn.textContent = 'Converting...';
+            pdfSubmitBtn.textContent = "{{ gettext('Converting...') }}";
             pdfSubmitBtn.disabled = true;
         });
     </script>

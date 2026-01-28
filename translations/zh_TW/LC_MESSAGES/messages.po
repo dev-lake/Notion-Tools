@@ -1,0 +1,147 @@
+# Chinese (Traditional) translations for Document Converter.
+# Copyright (C) 2026
+# This file is distributed under the same license as the Document Converter project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-28 12:00+0000\n"
+"PO-Revision-Date: 2026-01-28 12:00+0000\n"
+"Last-Translator: \n"
+"Language: zh_TW\n"
+"Language-Team: zh_TW <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Manual 1.0\n"
+
+msgid "Document Converter"
+msgstr "文件轉換器"
+
+msgid "Notion to Word"
+msgstr "Notion轉Word"
+
+msgid "Markdown to Word"
+msgstr "Markdown轉Word"
+
+msgid "PDF to Word"
+msgstr "PDF轉Word"
+
+msgid "Convert your Notion exports to beautifully formatted Word documents"
+msgstr "將您的Notion匯出檔案轉換為格式精美的Word文件"
+
+msgid "Convert standalone Markdown files to Word documents"
+msgstr "將獨立的Markdown檔案轉換為Word文件"
+
+msgid "Convert PDF documents to editable Word files"
+msgstr "將PDF文件轉換為可編輯的Word檔案"
+
+msgid "Click to select your Notion export"
+msgstr "點擊選擇您的Notion匯出檔案"
+
+msgid "Click to select Markdown file(s)"
+msgstr "點擊選擇Markdown檔案"
+
+msgid "Click to select PDF file(s)"
+msgstr "點擊選擇PDF檔案"
+
+msgid "or drag and drop a .zip file here"
+msgstr "或將.zip檔案拖放到此處"
+
+msgid "or drag and drop .md files here (supports multiple files)"
+msgstr "或將.md檔案拖放到此處（支援多個檔案）"
+
+msgid "or drag and drop .pdf files here (supports multiple files)"
+msgstr "或將.pdf檔案拖放到此處（支援多個檔案）"
+
+msgid "Convert to Word"
+msgstr "轉換為Word"
+
+msgid "Converting..."
+msgstr "轉換中..."
+
+msgid "Conversion Complete"
+msgstr "轉換完成"
+
+msgid "Your Word documents are ready to download"
+msgstr "您的Word文件已準備好下載"
+
+msgid "Download ZIP"
+msgstr "下載ZIP"
+
+msgid "Supported Features"
+msgstr "支援的功能"
+
+msgid "Headings & text formatting"
+msgstr "標題和文字格式"
+
+msgid "Bold, italic & code"
+msgstr "粗體、斜體和程式碼"
+
+msgid "Lists & nested lists"
+msgstr "清單和巢狀清單"
+
+msgid "Tables with headers"
+msgstr "帶標題的表格"
+
+msgid "Code blocks"
+msgstr "程式碼區塊"
+
+msgid "Links & images"
+msgstr "連結和圖片"
+
+msgid "Blockquotes"
+msgstr "引用區塊"
+
+msgid "Unicode filenames"
+msgstr "Unicode檔案名稱"
+
+msgid "Multiple files at once"
+msgstr "一次處理多個檔案"
+
+msgid "All Markdown syntax"
+msgstr "所有Markdown語法"
+
+msgid "GFM (GitHub Flavored)"
+msgstr "GFM（GitHub風格）"
+
+msgid "Tables & task lists"
+msgstr "表格和任務清單"
+
+msgid "Code blocks with syntax"
+msgstr "帶語法的程式碼區塊"
+
+msgid "Embedded images"
+msgstr "嵌入圖片"
+
+msgid "Chinese/CJK support"
+msgstr "中文/CJK支援"
+
+msgid "Batch download as ZIP"
+msgstr "批次下載為ZIP"
+
+msgid "Text extraction"
+msgstr "文字擷取"
+
+msgid "Table detection"
+msgstr "表格偵測"
+
+msgid "Multi-page support"
+msgstr "多頁支援"
+
+msgid "Batch conversion"
+msgstr "批次轉換"
+
+msgid "Heading detection"
+msgstr "標題偵測"
+
+msgid "Format preservation"
+msgstr "格式保留"
+
+msgid "ZIP download"
+msgstr "ZIP下載"
+
+msgid "Language"
+msgstr "語言"

@@ -28,6 +28,7 @@ COPY converter.py .
 COPY pdf_converter.py .
 COPY templates/ templates/
 COPY static/ static/
+COPY translations/ translations/
 
 # Create necessary directories
 RUN mkdir -p uploads output && \
