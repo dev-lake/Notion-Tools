@@ -39,6 +39,7 @@ def _set_font(run, is_code=False):
         run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Microsoft YaHei')
     else:
         run.font.name = 'Calibri'
+        run.font.size = Pt(11)  # Set default font size
         run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Microsoft YaHei')
         run._element.rPr.rFonts.set(qn('w:ascii'), 'Calibri')
         run._element.rPr.rFonts.set(qn('w:hAnsi'), 'Calibri')
@@ -46,7 +47,7 @@ def _set_font(run, is_code=False):
 
 def convert_pdf_to_docx(pdf_file_path, output_path, extract_images=True):
     """
-    Convert a PDF file to a Word document.
+    Convert a PDF file to a Word document with improved formatting.
 
     Args:
         pdf_file_path: Path to the PDF file
@@ -63,78 +64,163 @@ def convert_pdf_to_docx(pdf_file_path, output_path, extract_images=True):
         for page_num, page in enumerate(pdf.pages, 1):
             print(f"[DEBUG] Processing page {page_num}/{len(pdf.pages)}")
 
-            # Add page number heading (except for first page)
+            # Add page break (except for first page)
             if page_num > 1:
                 doc.add_page_break()
-                page_heading = doc.add_heading(f'Page {page_num}', level=2)
-                for run in page_heading.runs:
-                    _set_font(run)
 
-            # Extract text from page
-            text = page.extract_text()
+            # Get page layout info
+            page_width = page.width
+            page_height = page.height
+
+            # Extract images first if requested
+            images_positions = []
+            if extract_images:
+                try:
+                    images = page.images
+                    if images:
+                        print(f"[DEBUG] Found {len(images)} images on page {page_num}")
+                        for img in images:
+                            images_positions.append({
+                                'x0': img['x0'],
+                                'top': img['top'],
+                                'x1': img['x1'],
+                                'bottom': img['bottom']
+                            })
+                except Exception as e:
+                    print(f"[DEBUG] Error getting images info: {e}")
+
+            # Extract text with layout
+            text = page.extract_text(layout=True)
             if text:
-                # Clean text to remove XML-incompatible characters
+                # Clean text
                 text = _clean_text(text)
 
-                # Split text into paragraphs
-                paragraphs = text.split('\n')
-                for para_text in paragraphs:
-                    para_text = _clean_text(para_text)
-                    if para_text:
-                        # Detect if it looks like a heading (all caps, short, etc.)
-                        if _is_heading(para_text):
-                            heading = doc.add_heading(para_text, level=3)
-                            for run in heading.runs:
-                                _set_font(run)
-                        else:
-                            p = doc.add_paragraph(para_text)
-                            for run in p.runs:
-                                _set_font(run)
+                # Process text line by line to preserve layout
+                lines = text.split('\n')
+                current_para = []
 
-            # Extract tables
+                for line in lines:
+                    line = _clean_text(line)
+                    if not line:
+                        # Empty line - end current paragraph
+                        if current_para:
+                            para_text = ' '.join(current_para)
+                            _add_paragraph_with_style(doc, para_text)
+                            current_para = []
+                        continue
+
+                    # Check if line is a heading
+                    if _is_heading(line):
+                        # End current paragraph first
+                        if current_para:
+                            para_text = ' '.join(current_para)
+                            _add_paragraph_with_style(doc, para_text)
+                            current_para = []
+
+                        # Add heading
+                        heading = doc.add_heading(line, level=_get_heading_level(line))
+                        for run in heading.runs:
+                            _set_font(run)
+                    else:
+                        # Regular text - accumulate into paragraph
+                        current_para.append(line)
+
+                # Add remaining paragraph
+                if current_para:
+                    para_text = ' '.join(current_para)
+                    _add_paragraph_with_style(doc, para_text)
+
+            # Extract and add tables
             tables = page.extract_tables()
             if tables:
                 print(f"[DEBUG] Found {len(tables)} tables on page {page_num}")
                 for table_data in tables:
                     _add_table_to_doc(doc, table_data)
 
-            # Extract images if requested
-            if extract_images:
-                try:
-                    # Get images from page
-                    images = page.images
-                    if images:
-                        print(f"[DEBUG] Found {len(images)} images on page {page_num}")
-                        for img_index, img in enumerate(images):
-                            try:
-                                _extract_and_add_image(doc, page, img, page_num, img_index)
-                            except Exception as e:
-                                print(f"[DEBUG] Error extracting image {img_index} from page {page_num}: {e}")
-                except Exception as e:
-                    print(f"[DEBUG] Error processing images on page {page_num}: {e}")
+            # Extract and add images
+            if extract_images and images_positions:
+                for img_index, img_pos in enumerate(images_positions):
+                    try:
+                        _extract_and_add_image(doc, page, img_pos, page_num, img_index)
+                    except Exception as e:
+                        print(f"[DEBUG] Error extracting image {img_index}: {e}")
 
     # Save document
     doc.save(output_path)
     print(f"[DEBUG] PDF converted successfully to {output_path}")
 
 
+def _add_paragraph_with_style(doc, text):
+    """Add a paragraph with proper styling."""
+    if not text or not text.strip():
+        return
+
+    p = doc.add_paragraph(text)
+    for run in p.runs:
+        _set_font(run)
+
+    # Set paragraph spacing
+    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.line_spacing = 1.15
+
+
 def _is_heading(text):
     """
-    Detect if text looks like a heading.
+    Detect if text looks like a heading with improved logic.
     """
     text = text.strip()
-    # Check if text is short and mostly uppercase
-    if len(text) < 100 and text.isupper():
+    if not text or len(text) > 150:
+        return False
+
+    # Check for numbered headings (1. 1.1 第一章 etc.)
+    if re.match(r'^[\d一二三四五六七八九十]+[\.、\s]', text):
         return True
-    # Check if text starts with numbers (like "1. ", "1.1 ")
-    if text and text[0].isdigit() and ('.' in text[:10] or ')' in text[:10]):
+
+    # Check for chapter/section markers
+    if re.match(r'^(第[一二三四五六七八九十\d]+[章节部分]|Chapter|Section|CHAPTER|SECTION)', text):
         return True
+
+    # Check if mostly uppercase and short
+    if len(text) < 50 and sum(1 for c in text if c.isupper()) / len(text) > 0.7:
+        return True
+
+    # Check for common heading patterns
+    if text.endswith('：') or text.endswith(':'):
+        return True
+
     return False
+
+
+def _get_heading_level(text):
+    """Determine heading level based on text content."""
+    text = text.strip()
+
+    # Level 1: Chapter markers
+    if re.match(r'^(第[一二三四五六七八九十\d]+章|Chapter\s+\d+|CHAPTER\s+\d+)', text):
+        return 1
+
+    # Level 2: Section markers or numbered like 1. 2.
+    if re.match(r'^[\d一二三四五六七八九十]+[\.、]\s', text):
+        # Count dots to determine level
+        dots = text.count('.')
+        if dots == 0:
+            return 2
+        elif dots == 1:
+            return 3
+        else:
+            return 4
+
+    # Level 2: Section markers
+    if re.match(r'^(第[一二三四五六七八九十\d]+节|Section)', text):
+        return 2
+
+    # Default to level 3
+    return 3
 
 
 def _add_table_to_doc(doc, table_data):
     """
-    Add a table to the Word document.
+    Add a table to the Word document with improved formatting.
     """
     if not table_data or len(table_data) == 0:
         return
@@ -158,10 +244,13 @@ def _add_table_to_doc(doc, table_data):
                 # Clean cell text
                 cell_text = _clean_text(str(cell))
                 table.rows[i].cells[j].text = cell_text
+
                 # Set font for table cells
                 for paragraph in table.rows[i].cells[j].paragraphs:
                     for run in paragraph.runs:
+                        run.font.size = Pt(10)
                         _set_font(run)
+
                 # Make first row bold (header)
                 if i == 0:
                     for paragraph in table.rows[i].cells[j].paragraphs:
@@ -169,84 +258,56 @@ def _add_table_to_doc(doc, table_data):
                             run.bold = True
 
     # Add spacing after table
-    doc.add_paragraph()
+    p = doc.add_paragraph()
+    p.paragraph_format.space_after = Pt(12)
 
 
-def _extract_and_add_image(doc, page, img_info, page_num, img_index):
+def _extract_and_add_image(doc, page, img_pos, page_num, img_index):
     """
-    Extract image from PDF page and add to Word document.
+    Extract image from PDF page and add to Word document with improved handling.
     """
     try:
-        # Get image coordinates
-        x0, y0, x1, y1 = img_info['x0'], img_info['top'], img_info['x1'], img_info['bottom']
+        x0, y0, x1, y1 = img_pos['x0'], img_pos['top'], img_pos['x1'], img_pos['bottom']
+
+        # Skip very small images (likely decorative)
+        width = x1 - x0
+        height = y1 - y0
+        if width < 20 or height < 20:
+            print(f"[DEBUG] Skipping small image {img_index} ({width}x{height})")
+            return
 
         # Crop image from page
         bbox = (x0, y0, x1, y1)
         cropped_page = page.crop(bbox)
 
-        # Convert to image
-        img = cropped_page.to_image(resolution=150)
+        # Convert to image with higher resolution
+        img = cropped_page.to_image(resolution=200)
 
         # Save to bytes
         img_bytes = io.BytesIO()
         img.save(img_bytes, format='PNG')
         img_bytes.seek(0)
 
-        # Add to document
-        # Calculate width (max 6 inches)
-        width = min(6, (x1 - x0) / 72)  # Convert points to inches
-        doc.add_picture(img_bytes, width=Inches(width))
-        doc.add_paragraph()  # Add spacing after image
+        # Calculate width (max 6 inches, maintain aspect ratio)
+        img_width_inches = min(6, width / 72)  # Convert points to inches
 
-        print(f"[DEBUG] Added image {img_index} from page {page_num}")
+        # Add to document
+        doc.add_picture(img_bytes, width=Inches(img_width_inches))
+
+        # Add spacing after image
+        p = doc.add_paragraph()
+        p.paragraph_format.space_after = Pt(12)
+
+        print(f"[DEBUG] Added image {img_index} from page {page_num} ({width:.0f}x{height:.0f})")
+
     except Exception as e:
         print(f"[DEBUG] Could not extract image {img_index} from page {page_num}: {e}")
-        # Add placeholder text
-        p = doc.add_paragraph(f'[Image {img_index} from page {page_num}]')
-        for run in p.runs:
-            run.italic = True
-            _set_font(run)
 
 
 def convert_pdf_to_docx_simple(pdf_file_path, output_path):
     """
-    Simple PDF to Word conversion (text only, no images).
-    Faster and more reliable for text-heavy PDFs.
+    Simple PDF to Word conversion with improved formatting.
     """
-    doc = Document()
+    # Use the full conversion with images enabled
+    convert_pdf_to_docx(pdf_file_path, output_path, extract_images=True)
 
-    with pdfplumber.open(pdf_file_path) as pdf:
-        print(f"[DEBUG] Processing PDF with {len(pdf.pages)} pages (simple mode)")
-
-        for page_num, page in enumerate(pdf.pages, 1):
-            # Add page break (except for first page)
-            if page_num > 1:
-                doc.add_page_break()
-
-            # Extract text
-            text = page.extract_text()
-            if text:
-                # Clean text
-                text = _clean_text(text)
-
-                paragraphs = text.split('\n')
-                for para_text in paragraphs:
-                    para_text = _clean_text(para_text)
-                    if para_text:
-                        if _is_heading(para_text):
-                            heading = doc.add_heading(para_text, level=3)
-                            for run in heading.runs:
-                                _set_font(run)
-                        else:
-                            p = doc.add_paragraph(para_text)
-                            for run in p.runs:
-                                _set_font(run)
-
-            # Extract tables
-            tables = page.extract_tables()
-            if tables:
-                for table_data in tables:
-                    _add_table_to_doc(doc, table_data)
-
-    doc.save(output_path)
-    print(f"[DEBUG] PDF converted successfully (simple mode)")
