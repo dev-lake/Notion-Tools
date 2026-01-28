@@ -3,10 +3,36 @@ import re
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml.ns import qn
 import markdown2
 from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.parse import unquote
+
+
+def _set_font(run, is_code=False):
+    """
+    Set appropriate fonts for text to ensure compatibility with Microsoft Word.
+
+    Args:
+        run: The run object to set font for
+        is_code: Whether this is code text (uses monospace font)
+    """
+    if is_code:
+        # Code blocks use monospace font
+        run.font.name = 'Consolas'
+        run.font.size = Pt(9)
+        # Set East Asian font for Chinese characters in code
+        run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Microsoft YaHei')
+    else:
+        # Regular text uses standard fonts
+        run.font.name = 'Calibri'
+        # Set East Asian font for Chinese/Japanese/Korean characters
+        # This ensures proper display in Microsoft Word
+        run._element.rPr.rFonts.set(qn('w:eastAsia'), 'Microsoft YaHei')
+        # Set fallback fonts for better compatibility
+        run._element.rPr.rFonts.set(qn('w:ascii'), 'Calibri')
+        run._element.rPr.rFonts.set(qn('w:hAnsi'), 'Calibri')
 
 
 def convert_markdown_to_docx(md_file_path, output_path, images_dir=None):
@@ -59,6 +85,9 @@ def _process_element(doc, element, images_dir, list_level=0):
             # Skip whitespace-only text nodes at document level
             if child.strip():
                 p = doc.add_paragraph(child.strip())
+                # Set font for all runs in the paragraph
+                for run in p.runs:
+                    _set_font(run)
             continue
 
         tag_name = child.name
@@ -67,7 +96,10 @@ def _process_element(doc, element, images_dir, list_level=0):
         if tag_name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
             level = int(tag_name[1])
             text = child.get_text()
-            doc.add_heading(text, level=level)
+            heading = doc.add_heading(text, level=level)
+            # Set font for heading
+            for run in heading.runs:
+                _set_font(run)
 
         # Paragraphs
         elif tag_name == 'p':
@@ -90,11 +122,9 @@ def _process_element(doc, element, images_dir, list_level=0):
         elif tag_name == 'pre':
             code = child.get_text()
             p = doc.add_paragraph(code)
-            # Set monospace font
+            # Set monospace font for code
             for run in p.runs:
-                run.font.name = 'Courier New'
-                run.font.size = Pt(9)
-            # Add light gray background effect via shading would require more complex docx manipulation
+                _set_font(run, is_code=True)
 
         # Blockquotes
         elif tag_name == 'blockquote':
@@ -119,7 +149,8 @@ def _process_inline_elements(paragraph, element, images_dir):
     for child in element.children:
         if isinstance(child, str):
             if child.strip() or child == ' ':
-                paragraph.add_run(child)
+                run = paragraph.add_run(child)
+                _set_font(run)
             continue
 
         tag_name = child.name
@@ -129,17 +160,18 @@ def _process_inline_elements(paragraph, element, images_dir):
         if tag_name in ['strong', 'b']:
             run = paragraph.add_run(text)
             run.bold = True
+            _set_font(run)
 
         # Emphasis/Italic
         elif tag_name in ['em', 'i']:
             run = paragraph.add_run(text)
             run.italic = True
+            _set_font(run)
 
         # Code (inline)
         elif tag_name == 'code':
             run = paragraph.add_run(text)
-            run.font.name = 'Courier New'
-            run.font.size = Pt(9)
+            _set_font(run, is_code=True)
 
         # Links
         elif tag_name == 'a':
@@ -148,6 +180,7 @@ def _process_inline_elements(paragraph, element, images_dir):
             run = paragraph.add_run(f'{text} ({href})')
             run.font.color.rgb = RGBColor(0, 0, 255)
             run.underline = True
+            _set_font(run)
 
         # Images
         elif tag_name == 'img':
@@ -178,6 +211,9 @@ def _process_list(doc, list_element, images_dir, ordered=False, level=0):
         if text:
             p = doc.add_paragraph(text, style='List Number' if ordered else 'List Bullet')
             p.paragraph_format.left_indent = Inches(0.5 * (level + 1))
+            # Set font for list items
+            for run in p.runs:
+                _set_font(run)
 
         # Process nested lists
         for nested in li.find_all(['ul', 'ol'], recursive=False):
@@ -208,11 +244,17 @@ def _process_table(doc, table_element):
         for j, cell in enumerate(cells):
             if j < num_cols:  # Safety check
                 table.rows[i].cells[j].text = cell.get_text().strip()
-                # Make header row bold
+                # Set font and make header row bold
                 if i == 0 or cell.name == 'th':
                     for paragraph in table.rows[i].cells[j].paragraphs:
                         for run in paragraph.runs:
                             run.bold = True
+                            _set_font(run)
+                else:
+                    # Set font for regular cells
+                    for paragraph in table.rows[i].cells[j].paragraphs:
+                        for run in paragraph.runs:
+                            _set_font(run)
 
 
 def _add_image_to_paragraph(paragraph, image_src, images_dir):
