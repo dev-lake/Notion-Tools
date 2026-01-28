@@ -25,7 +25,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY app.py .
 COPY converter.py .
+COPY pdf_converter.py .
 COPY templates/ templates/
+COPY static/ static/
 
 # Create necessary directories
 RUN mkdir -p uploads output && \
