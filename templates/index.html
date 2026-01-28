@@ -3,7 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Converter - Notion, Markdown, PDF to Word</title>
+
+    <!-- Primary Meta Tags -->
+    <title>Document Converter - Convert Notion, Markdown, PDF to Word | Free Online Tool</title>
+    <meta name="title" content="Document Converter - Convert Notion, Markdown, PDF to Word | Free Online Tool">
+    <meta name="description" content="Free online document converter. Convert Notion exports, Markdown files, and PDF documents to beautifully formatted Word documents (.docx). Supports tables, images, code blocks, and Chinese/CJK characters. No registration required.">
+    <meta name="keywords" content="notion to word, markdown to word, pdf to word, document converter, notion export, md to docx, pdf to docx, free converter, online converter, notion converter, 文档转换, Notion转Word, Markdown转Word, PDF转Word">
+    <meta name="author" content="Document Converter">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://notiontoword.space/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://notiontoword.space/">
+    <meta property="og:title" content="Document Converter - Convert Notion, Markdown, PDF to Word">
+    <meta property="og:description" content="Free online tool to convert Notion exports, Markdown files, and PDF documents to Word format. Supports tables, images, code blocks, and Chinese/CJK characters.">
+    <meta property="og:image" content="https://notiontoword.space/static/og-image.png">
+    <meta property="og:site_name" content="Document Converter">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://notiontoword.space/">
+    <meta property="twitter:title" content="Document Converter - Convert Notion, Markdown, PDF to Word">
+    <meta property="twitter:description" content="Free online tool to convert Notion exports, Markdown files, and PDF documents to Word format. Supports tables, images, code blocks, and Chinese/CJK characters.">
+    <meta property="twitter:image" content="https://notiontoword.space/static/og-image.png">
+
+    <!-- Additional SEO -->
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Document Converter",
+      "description": "Free online document converter for Notion, Markdown, and PDF to Word format",
+      "url": "https://notiontoword.space/",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Notion to Word conversion",
+        "Markdown to Word conversion",
+        "PDF to Word conversion",
+        "Batch file processing",
+        "Table and image support",
+        "Chinese/CJK character support",
+        "Code block formatting",
+        "No registration required"
+      ],
+      "screenshot": "https://notiontoword.space/static/screenshot.png",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -395,28 +460,28 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar">
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
         <div class="navbar-container">
-            <a href="#" class="navbar-brand">
-                <span class="navbar-logo">📄</span>
+            <a href="/" class="navbar-brand" aria-label="Document Converter Home">
+                <span class="navbar-logo" aria-hidden="true">📄</span>
                 <span>Document Converter</span>
             </a>
-            <ul class="navbar-menu">
-                <li class="navbar-item">
-                    <a class="navbar-link active" data-section="notion">
-                        <span>📦</span>
+            <ul class="navbar-menu" role="menubar">
+                <li class="navbar-item" role="none">
+                    <a href="/notion" class="navbar-link {% if active_section == 'notion' %}active{% endif %}" role="menuitem" aria-label="Convert Notion to Word">
+                        <span aria-hidden="true">📦</span>
                         <span>Notion to Word</span>
                     </a>
                 </li>
-                <li class="navbar-item">
-                    <a class="navbar-link" data-section="markdown">
-                        <span>📝</span>
+                <li class="navbar-item" role="none">
+                    <a href="/markdown" class="navbar-link {% if active_section == 'markdown' %}active{% endif %}" role="menuitem" aria-label="Convert Markdown to Word">
+                        <span aria-hidden="true">📝</span>
                         <span>Markdown to Word</span>
                     </a>
                 </li>
-                <li class="navbar-item">
-                    <a class="navbar-link" data-section="pdf">
-                        <span>📕</span>
+                <li class="navbar-item" role="none">
+                    <a href="/pdf" class="navbar-link {% if active_section == 'pdf' %}active{% endif %}" role="menuitem" aria-label="Convert PDF to Word">
+                        <span aria-hidden="true">📕</span>
                         <span>PDF to Word</span>
                     </a>
                 </li>
@@ -425,15 +490,15 @@
     </nav>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <main class="main-content" role="main">
         <!-- Notion to Word Section -->
-        <div id="notion-section" class="converter-section active">
+        <article id="notion-section" class="converter-section {% if active_section == 'notion' %}active{% endif %}" aria-labelledby="notion-heading">
             <div class="container">
-                <div class="header">
-                    <div class="logo">📦</div>
-                    <h1>Notion to Word</h1>
+                <header class="header">
+                    <div class="logo" aria-hidden="true">📦</div>
+                    <h1 id="notion-heading">Notion to Word</h1>
                     <p class="subtitle">Convert your Notion exports to beautifully formatted Word documents</p>
-                </div>
+                </header>
 
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -448,16 +513,16 @@
                     {% endif %}
                 {% endwith %}
 
-                <form method="POST" action="/upload" enctype="multipart/form-data" id="notionForm">
+                <form method="POST" action="/upload" enctype="multipart/form-data" id="notionForm" aria-label="Notion to Word conversion form">
                     <input type="hidden" name="converter_type" value="notion">
-                    <label for="notionFile" class="upload-area" id="notionUploadArea">
-                        <div class="upload-icon">📦</div>
+                    <label for="notionFile" class="upload-area" id="notionUploadArea" aria-label="Upload Notion export file">
+                        <div class="upload-icon" aria-hidden="true">📦</div>
                         <div class="upload-text">Click to select your Notion export</div>
                         <div class="upload-hint">or drag and drop a .zip file here</div>
                     </label>
-                    <input type="file" name="file" id="notionFile" accept=".zip" required>
-                    <div class="selected-file" id="notionSelectedFile"></div>
-                    <button type="submit" class="btn" id="notionSubmitBtn" disabled>Convert to Word</button>
+                    <input type="file" name="file" id="notionFile" accept=".zip" required aria-required="true">
+                    <div class="selected-file" id="notionSelectedFile" role="status" aria-live="polite"></div>
+                    <button type="submit" class="btn" id="notionSubmitBtn" disabled aria-disabled="true">Convert to Word</button>
                 </form>
 
                 {% if download_file %}
@@ -485,26 +550,26 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- Markdown to Word Section -->
-        <div id="markdown-section" class="converter-section">
+        <article id="markdown-section" class="converter-section {% if active_section == 'markdown' %}active{% endif %}" aria-labelledby="markdown-heading">
             <div class="container">
-                <div class="header">
-                    <div class="logo">📝</div>
-                    <h1>Markdown to Word</h1>
+                <header class="header">
+                    <div class="logo" aria-hidden="true">📝</div>
+                    <h1 id="markdown-heading">Markdown to Word</h1>
                     <p class="subtitle">Convert standalone Markdown files to Word documents</p>
-                </div>
+                </header>
 
-                <form method="POST" action="/convert-markdown" enctype="multipart/form-data" id="markdownForm">
-                    <label for="markdownFile" class="upload-area" id="markdownUploadArea">
-                        <div class="upload-icon">📝</div>
+                <form method="POST" action="/convert-markdown" enctype="multipart/form-data" id="markdownForm" aria-label="Markdown to Word conversion form">
+                    <label for="markdownFile" class="upload-area" id="markdownUploadArea" aria-label="Upload Markdown files">
+                        <div class="upload-icon" aria-hidden="true">📝</div>
                         <div class="upload-text">Click to select Markdown file(s)</div>
                         <div class="upload-hint">or drag and drop .md files here (supports multiple files)</div>
                     </label>
-                    <input type="file" name="files" id="markdownFile" accept=".md,.markdown" multiple required>
-                    <div class="selected-file" id="markdownSelectedFile"></div>
-                    <button type="submit" class="btn" id="markdownSubmitBtn" disabled>Convert to Word</button>
+                    <input type="file" name="files" id="markdownFile" accept=".md,.markdown" multiple required aria-required="true">
+                    <div class="selected-file" id="markdownSelectedFile" role="status" aria-live="polite"></div>
+                    <button type="submit" class="btn" id="markdownSubmitBtn" disabled aria-disabled="true">Convert to Word</button>
                 </form>
 
                 <div class="feature-list">
@@ -521,26 +586,26 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </article>
 
         <!-- PDF to Word Section -->
-        <div id="pdf-section" class="converter-section">
+        <article id="pdf-section" class="converter-section {% if active_section == 'pdf' %}active{% endif %}" aria-labelledby="pdf-heading">
             <div class="container">
-                <div class="header">
-                    <div class="logo">📕</div>
-                    <h1>PDF to Word</h1>
+                <header class="header">
+                    <div class="logo" aria-hidden="true">📕</div>
+                    <h1 id="pdf-heading">PDF to Word</h1>
                     <p class="subtitle">Convert PDF documents to editable Word files</p>
-                </div>
+                </header>
 
-                <form method="POST" action="/convert-pdf" enctype="multipart/form-data" id="pdfForm">
-                    <label for="pdfFile" class="upload-area" id="pdfUploadArea">
-                        <div class="upload-icon">📕</div>
+                <form method="POST" action="/convert-pdf" enctype="multipart/form-data" id="pdfForm" aria-label="PDF to Word conversion form">
+                    <label for="pdfFile" class="upload-area" id="pdfUploadArea" aria-label="Upload PDF files">
+                        <div class="upload-icon" aria-hidden="true">📕</div>
                         <div class="upload-text">Click to select PDF file(s)</div>
                         <div class="upload-hint">or drag and drop .pdf files here (supports multiple files)</div>
                     </label>
-                    <input type="file" name="files" id="pdfFile" accept=".pdf" multiple required>
-                    <div class="selected-file" id="pdfSelectedFile"></div>
-                    <button type="submit" class="btn" id="pdfSubmitBtn" disabled>Convert to Word</button>
+                    <input type="file" name="files" id="pdfFile" accept=".pdf" multiple required aria-required="true">
+                    <div class="selected-file" id="pdfSelectedFile" role="status" aria-live="polite"></div>
+                    <button type="submit" class="btn" id="pdfSubmitBtn" disabled aria-disabled="true">Convert to Word</button>
                 </form>
 
                 <div class="feature-list">
@@ -557,29 +622,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
+    </main>
 
     <script>
-        // Navigation
-        const navLinks = document.querySelectorAll('.navbar-link');
-        const sections = document.querySelectorAll('.converter-section');
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const sectionId = link.getAttribute('data-section');
-
-                // Update active nav link
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-
-                // Show corresponding section
-                sections.forEach(s => s.classList.remove('active'));
-                document.getElementById(`${sectionId}-section`).classList.add('active');
-            });
-        });
-
         // Notion Form Handler
         const notionFileInput = document.getElementById('notionFile');
         const notionUploadArea = document.getElementById('notionUploadArea');

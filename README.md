@@ -1,36 +1,55 @@
-# Notion to Word Converter
+# Document Converter - Notion, Markdown, PDF to Word
 
 [![Online Service](https://img.shields.io/badge/🌐_Try_Online-notiontoword.space-blue?style=for-the-badge)](https://notiontoword.space/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://github.com/dev-lake/Notion-Tools)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![SEO](https://img.shields.io/badge/SEO-Optimized-success?style=for-the-badge)](SEO_IMPLEMENTATION.md)
 
-A Flask web application that converts Notion-exported markdown files to beautifully formatted Word documents (.docx). Supports batch conversion, preserves formatting, and handles images including those with URL-encoded paths (e.g., Chinese characters).
+A Flask web application that converts Notion exports, Markdown files, and PDF documents to beautifully formatted Word documents (.docx). Supports batch conversion, preserves formatting, handles images, and includes comprehensive SEO optimization for maximum discoverability.
 
 ## 🌐 Online Service
 
 **Try it now without installation:** [https://notiontoword.space/](https://notiontoword.space/)
 
-No setup required - just upload your Notion export and download the converted Word documents!
+No setup required - just upload your files and download the converted Word documents!
 
 ## Features
 
+### Three Powerful Converters
+- 📦 **Notion to Word**: Convert Notion export zip files with full formatting preservation
+- 📝 **Markdown to Word**: Convert standalone .md files with GitHub Flavored Markdown support
+- 📕 **PDF to Word**: Convert PDF documents to editable Word format with text, tables, and images
+
 ### Core Functionality
-- 📤 Upload Notion export zip files through web interface
-- 🔄 Convert multiple markdown files at once (batch processing)
+- 📤 Upload files through intuitive web interface
+- 🔄 Batch processing - convert multiple files at once
 - 📦 Download all converted documents as a single zip file
-- 🌐 Handles URL-encoded filenames (supports Chinese, Japanese, Korean, and other Unicode characters)
+- 🌐 Full Unicode support (Chinese, Japanese, Korean, and other languages)
 - 🖼️ Automatic image extraction and embedding
+- 🎨 Notion-style clean and modern UI
 
 ### Formatting Support
-- **Headings**: H1-H6 with proper hierarchy
-- **Text Styling**: Bold, italic, inline code
+- **Headings**: H1-H6 with proper hierarchy and auto-detection
+- **Text Styling**: Bold, italic, inline code, strikethrough
 - **Lists**: Bulleted and numbered lists with nested support
 - **Tables**: Full table support with header formatting
 - **Code Blocks**: Syntax-preserved code blocks with monospace font
 - **Links**: Hyperlinks with URL display
-- **Images**: Embedded images with automatic sizing (max 6 inches width)
+- **Images**: Embedded images with automatic sizing
 - **Blockquotes**: Indented quote blocks
-- **Horizontal Rules**: Section dividers
+- **Chinese/CJK Characters**: Proper font settings for Microsoft Word compatibility
+
+### SEO Optimization
+- 🔍 **Comprehensive Meta Tags**: Title, description, keywords (English + Chinese)
+- 📱 **Open Graph Tags**: Optimized for Facebook, LinkedIn sharing
+- 🐦 **Twitter Cards**: Rich preview cards for Twitter
+- 📊 **Structured Data**: Schema.org JSON-LD for rich search results
+- 🤖 **robots.txt**: Proper search engine crawling configuration
+- 🗺️ **sitemap.xml**: Complete sitemap for search engines
+- ♿ **Accessibility**: ARIA labels and semantic HTML throughout
+- 📈 **Search Engine Ready**: Optimized for Google, Bing, Baidu
+
+See [SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md) for complete SEO documentation.
 
 ## Installation
 

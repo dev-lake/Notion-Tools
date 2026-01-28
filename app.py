@@ -40,7 +40,40 @@ def cleanup_temp_files(temp_dir):
 def index():
     # Get download file from session if it exists
     download_file = session.pop('download_file', None)
-    return render_template('index.html', download_file=download_file)
+    return render_template('index.html', download_file=download_file, active_section='notion')
+
+
+@app.route('/notion')
+def notion_converter():
+    """Notion to Word converter page."""
+    download_file = session.pop('download_file', None)
+    return render_template('index.html', download_file=download_file, active_section='notion')
+
+
+@app.route('/markdown')
+def markdown_converter():
+    """Markdown to Word converter page."""
+    download_file = session.pop('download_file', None)
+    return render_template('index.html', download_file=download_file, active_section='markdown')
+
+
+@app.route('/pdf')
+def pdf_converter():
+    """PDF to Word converter page."""
+    download_file = session.pop('download_file', None)
+    return render_template('index.html', download_file=download_file, active_section='pdf')
+
+
+@app.route('/robots.txt')
+def robots():
+    """Serve robots.txt for SEO."""
+    return send_file('static/robots.txt', mimetype='text/plain')
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    """Serve sitemap.xml for SEO."""
+    return send_file('static/sitemap.xml', mimetype='application/xml')
 
 
 @app.route('/upload', methods=['POST'])
