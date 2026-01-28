@@ -24,7 +24,7 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
 
 # Babel configuration for i18n
 app.config['BABEL_DEFAULT_LOCALE'] = 'en'
-app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'zh_CN', 'zh_TW', 'ja']
+app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'zh_Hans_CN', 'zh_Hant_TW', 'ja']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 
 babel = Babel(app)
@@ -33,9 +33,17 @@ def get_locale():
     """Determine the best locale for the user."""
     # 1. Check URL parameter
     lang = request.args.get('lang')
-    if lang in app.config['BABEL_SUPPORTED_LOCALES']:
-        session['language'] = lang
-        return lang
+    # Map user-friendly codes to Flask-Babel locale codes
+    locale_map = {
+        'zh_CN': 'zh_Hans_CN',
+        'zh_TW': 'zh_Hant_TW',
+        'ja': 'ja',
+        'en': 'en'
+    }
+    if lang in locale_map:
+        mapped_locale = locale_map[lang]
+        session['language'] = mapped_locale
+        return mapped_locale
 
     # 2. Check session
     if 'language' in session:
@@ -64,8 +72,18 @@ def cleanup_temp_files(temp_dir):
 @app.context_processor
 def inject_locale():
     """Inject current locale and available locales into all templates."""
+    current = str(get_locale())
+    # Map Flask-Babel locale codes back to user-friendly codes
+    reverse_map = {
+        'zh_Hans_CN': 'zh_CN',
+        'zh_Hant_TW': 'zh_TW',
+        'ja': 'ja',
+        'en': 'en'
+    }
+    user_friendly_locale = reverse_map.get(current, 'en')
+
     return {
-        'current_locale': str(get_locale()),
+        'current_locale': user_friendly_locale,
         'available_locales': {
             'en': 'English',
             'zh_CN': '简体中文',
