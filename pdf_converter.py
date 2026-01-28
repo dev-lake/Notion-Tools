@@ -6,6 +6,27 @@ from docx.oxml.ns import qn
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from PIL import Image
 import io
+import re
+
+
+def _clean_text(text):
+    """
+    Clean text to remove XML-incompatible characters.
+    Removes NULL bytes, control characters, and other problematic characters.
+    """
+    if not text:
+        return ""
+
+    # Remove NULL bytes
+    text = text.replace('\x00', '')
+
+    # Remove other control characters except newline, tab, and carriage return
+    text = ''.join(char for char in text if ord(char) >= 32 or char in '\n\r\t')
+
+    # Remove any remaining problematic Unicode characters
+    text = text.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
+
+    return text.strip()
 
 
 def _set_font(run, is_code=False):
@@ -52,17 +73,21 @@ def convert_pdf_to_docx(pdf_file_path, output_path, extract_images=True):
             # Extract text from page
             text = page.extract_text()
             if text:
+                # Clean text to remove XML-incompatible characters
+                text = _clean_text(text)
+
                 # Split text into paragraphs
                 paragraphs = text.split('\n')
                 for para_text in paragraphs:
-                    if para_text.strip():
+                    para_text = _clean_text(para_text)
+                    if para_text:
                         # Detect if it looks like a heading (all caps, short, etc.)
                         if _is_heading(para_text):
-                            heading = doc.add_heading(para_text.strip(), level=3)
+                            heading = doc.add_heading(para_text, level=3)
                             for run in heading.runs:
                                 _set_font(run)
                         else:
-                            p = doc.add_paragraph(para_text.strip())
+                            p = doc.add_paragraph(para_text)
                             for run in p.runs:
                                 _set_font(run)
 
@@ -130,7 +155,9 @@ def _add_table_to_doc(doc, table_data):
     for i, row in enumerate(valid_rows):
         for j, cell in enumerate(row):
             if j < num_cols and cell is not None:
-                table.rows[i].cells[j].text = str(cell).strip()
+                # Clean cell text
+                cell_text = _clean_text(str(cell))
+                table.rows[i].cells[j].text = cell_text
                 # Set font for table cells
                 for paragraph in table.rows[i].cells[j].paragraphs:
                     for run in paragraph.runs:
@@ -199,15 +226,19 @@ def convert_pdf_to_docx_simple(pdf_file_path, output_path):
             # Extract text
             text = page.extract_text()
             if text:
+                # Clean text
+                text = _clean_text(text)
+
                 paragraphs = text.split('\n')
                 for para_text in paragraphs:
-                    if para_text.strip():
+                    para_text = _clean_text(para_text)
+                    if para_text:
                         if _is_heading(para_text):
-                            heading = doc.add_heading(para_text.strip(), level=3)
+                            heading = doc.add_heading(para_text, level=3)
                             for run in heading.runs:
                                 _set_font(run)
                         else:
-                            p = doc.add_paragraph(para_text.strip())
+                            p = doc.add_paragraph(para_text)
                             for run in p.runs:
                                 _set_font(run)
 
